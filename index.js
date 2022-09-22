@@ -1,5 +1,5 @@
 /*
- * Snapshot ERC721
+ * Snapshot ERC1155
  *
  * Copyright (c) edy
  *   https://github.com/cryptedy
@@ -10,7 +10,7 @@
  * Thanks to Alchemy
  * 
  * GitHub repository:
- * see https://github.com/cryptedy/snapshot-erc721
+ * see https://github.com/cryptedy/snapshot-erc1155
  */
 
 require("dotenv").config();
@@ -22,6 +22,7 @@ const path = require("path");
 let cwd = process.cwd();
 let ownerList={};
 let fnOwner, fnBalance;
+let tokenId = conf?.tokenId
 
 const main = async () =>{
     // prepare alchemy endpoint with apikey by chain
@@ -50,8 +51,8 @@ const main = async () =>{
         process.exit(1);
     }
 
-    // set category for erc721
-    conf.params.category = ["erc721"];
+    // set category for erc1155
+    conf.params.category = ['erc1155'];
 
     // init file path
     if (!conf?.output?.ownerOf  || !conf?.output?.balanceOf){
@@ -124,9 +125,19 @@ const requestData = async (url, data) =>{
         // update owner list
         const transfers = response.data.result.transfers;
         let len = transfers.length;
-        for (let i = 0 ; i < len ; i++){
-            let id = parseInt(transfers[i].tokenId,16).toString();
-            ownerList[id] = transfers[i].to;
+        for (let i = 0; i < len; i++){
+            let id = parseInt(transfers[i].erc1155Metadata[0].tokenId, 16).toString();
+            if (id !== tokenId) {
+                continue
+            }
+            let value = parseInt(transfers[i].erc1155Metadata[0].value, 16);
+            if (!ownerList[transfers[i].to]) ownerList[transfers[i].to] = 0
+            if (!ownerList[transfers[i].from]) ownerList[transfers[i].from] = 0
+            ownerList[transfers[i].to] += value;
+            ownerList[transfers[i].from] -= value;
+            if (ownerList[transfers[i].from] < 1) {
+                delete ownerList[transfers[i].from]
+            }
         }
         console.log("finish parsing json, the amount of transfer:", len);
     })
@@ -140,19 +151,7 @@ const requestData = async (url, data) =>{
         }else{
             // save ownerOf data 
             fs.writeFileSync(fnOwner, JSON.stringify(ownerList));
-            // aggregate balance
-            let balance = {};
-            for (let i = 0 ; i < Object.keys(ownerList).length ; i++){
-                let addr = ownerList[Object.keys(ownerList)[i]];
-                if (balance[addr] == null){
-                    // add owner in balList and init count
-                    balance[addr] = 1;
-                } else {
-                    balance[addr] += 1;
-                }
-            }
-            // save balanceOf data
-            fs.writeFileSync(fnBalance, JSON.stringify(balance));
+
             // inform success of procession
             console.log("SUCCESS:finish writing the results in the specified filenames.");
         }

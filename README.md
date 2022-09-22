@@ -1,6 +1,6 @@
-# Snapshot for ERC721 with Alchemy Transfers API
+# Snapshot for ERC1155 with Alchemy Transfers API
 
-This repositry provides snapshot function for ERC721 with Alchemy Transfer API.
+This repositry provides snapshot function for ERC1155 with Alchemy Transfer API.
 
 ## How to use
 
@@ -51,4 +51,4 @@ That's all! Enjoy!
 
 ## License
 
-Snapshot ERC721 is released under the MIT license.
+Snapshot ERC1155 is released under the MIT license.
