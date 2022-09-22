@@ -2,7 +2,6 @@
     "chain" : "ethereum",
     "format" : "decimal",
     "output" : {
-        "ownerOf": ".snapshot/owner.json",
         "balanceOf" : ".snapshot/balance.json"
     },
     "params":{

@@ -21,7 +21,7 @@ const path = require("path");
 
 let cwd = process.cwd();
 let ownerList={};
-let fnOwner, fnBalance;
+let fnBalance;
 let tokenId = conf?.tokenId
 
 const main = async () =>{
@@ -55,13 +55,11 @@ const main = async () =>{
     conf.params.category = ['erc1155'];
 
     // init file path
-    if (!conf?.output?.ownerOf  || !conf?.output?.balanceOf){
+    if (!conf?.output?.balanceOf){
         console.log("ERROR:output filenames in snapshot.config.json are undefined.")
         process.exit(1);
     }
-    fnOwner = path.join(cwd,conf.output.ownerOf);
     fnBalance = path.join(cwd,conf.output.balanceOf);
-    if (!fs.existsSync(path.dirname(fnOwner))) fs.mkdirSync(path.dirname(fnOwner));
     if (!fs.existsSync(path.dirname(fnBalance))) fs.mkdirSync(path.dirname(fnBalance));
 
     // if decimal mode, change numbers from decimal to hex with 0x
@@ -150,7 +148,7 @@ const requestData = async (url, data) =>{
             requestData(url, data);
         }else{
             // save ownerOf data 
-            fs.writeFileSync(fnOwner, JSON.stringify(ownerList));
+            fs.writeFileSync(fnBalance, JSON.stringify(ownerList));
 
             // inform success of procession
             console.log("SUCCESS:finish writing the results in the specified filenames.");
